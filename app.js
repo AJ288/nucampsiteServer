@@ -14,10 +14,7 @@ const partnerRouter = require("./routes/partnerRouter");
 const mongoose = require("mongoose");
 
 const url = config.mongoUrl;
-const connect = mongoose.connect(url, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const connect = mongoose.connect(url);
 
 connect.then(
   () => console.log("Connected correctly to server"),
