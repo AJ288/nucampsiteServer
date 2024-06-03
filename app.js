@@ -2,7 +2,9 @@ var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
 var logger = require("morgan");
+var session = require("express-session");
 const passport = require("passport");
+const User = require("./models/user");
 const config = require("./config");
 
 var indexRouter = require("./routes/index");
@@ -22,7 +24,7 @@ connect.then(
   (err) => console.log(err)
 );
 
-var app = express();
+const app = express();
 
 // Secure traffic only
 app.all("*", (req, res, next) => {
@@ -39,7 +41,7 @@ app.all("*", (req, res, next) => {
   }
 });
 
-// view engine setup
+// view engine
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
@@ -48,7 +50,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-67890-09876-54321'));
 
+app.use(
+  session({
+    secret: "yourSecretKey", // Replace with your own secret
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
 app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
